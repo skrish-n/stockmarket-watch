@@ -16,7 +16,7 @@ class UserRegistration(Resource):
             return {'message': 'User {} already exists'.format(data['username'])}
 
         try:
-            new_user = stock = {
+            new_user = {
                 'username': data['username'],
                 'password': models.generate_hash(data['password'])
             }
@@ -96,5 +96,6 @@ class SecretResource(Resource):
     @jwt_required
     def get(self):
         return {
+            'jwtIdentity': get_jwt_identity(),
             'answer': 42
         }
