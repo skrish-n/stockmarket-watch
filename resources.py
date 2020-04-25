@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse
-import models
+import models,email_sends
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required,
                                 get_jwt_identity, get_raw_jwt)
 
@@ -23,6 +23,7 @@ class UserRegistration(Resource):
             models.save_one_to_db(new_user)
             access_token = create_access_token(identity=data['username'])
             refresh_token = create_refresh_token(identity=data['username'])
+
             return {
                 'message': 'User {} was created'.format(data['username']),
                 'access_token': access_token,
@@ -47,6 +48,8 @@ class UserLogin(Resource):
                 'access_token': access_token,
                 'refresh_token': refresh_token
             }
+        else:
+            return {'message':'password does not match'}
 
 
 class UserLogoutAccess(Resource):

@@ -2,11 +2,8 @@
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required,
                                 get_jwt_identity, get_raw_jwt)
 
-import requests
-import smtplib, ssl
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from run import dbConnection
+import requests, external_hits
+from run import dbConnection, db_stock_dump
 
 
 def getStockQuote(symbol):
@@ -19,63 +16,6 @@ def getStockQuote(symbol):
     price = float(data['Global Quote']['05. price'])
     print(data['Global Quote']['05. price'])
     return price
-
-
-def sendEmail(priceMessage):
-    port = 465
-    smtp_server = "smtp.gmail.com"
-    sender_email = "saitest101@gmail.com"
-    receiver_email = "080sai@gmail.com"
-    password = "saitest101adobe"
-    '''rec = []
-    for var in receiver_email:
-        rec.append(var.encode('utf-8'))
-
-    print(rec)
-    '''
-    print(receiver_email)
-    # print(type(receiver_email))
-    message = MIMEMultipart("alternative")
-    message["Subject"] = "Stock Price Alert"
-    message["From"] = sender_email
-    message["To"] = receiver_email
-
-    # Create the plain-text and HTML version of your message
-    text = """\
-	Hi User,
-	This is your stock price alert!
-	""" + priceMessage + """
-	"""
-    html = """\
-	<html>
-	  <body>
-	    <p>Hi User,<br/><br/>
-	      This is your stock price alert!<br>
-	     """ + priceMessage + """ <br/> <br/>
-	       Regards, <br>
-	       Your humble script.
-	    </p>
-	  </body>
-	</html>
-	"""
-
-    # Turn these into plain/html MIMEText objects
-    part1 = MIMEText(text, "plain")
-    part2 = MIMEText(html, "html")
-
-    # Add HTML/plain-text parts to MIMEMultipart message
-    # The email client will try to render the last part first
-    message.attach(part1)
-    message.attach(part2)
-
-    # Create secure connection with server and send email
-    context = ssl.create_default_context()
-    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
-        server.login(sender_email, password)
-        server.sendmail(
-            sender_email, receiver_email, message.as_string()
-        )
-        # Create a secure SSL context
 
 
 def main():
@@ -99,12 +39,32 @@ def main():
 
 
 @jwt_required
-def add_stock_details(json_data, user_name):
-    fetch_result = dbConnection.find_one({'username': user_name})
+def add_user_stock_details(json_data, user_name):
+    print('#####Entering add_user_stock_details####')
+    fetch_result = dbConnection.find_one({'username': user_name, 'stockDetails.ticker': json_data['ticker']})
     if fetch_result is None:
-        return False
-    try:
-        dbConnection.update({'username': user_name}, {'$push': {'stockDetails':json_data}})
-        return True
-    except:
-        return False
+        try:
+            dbConnection.update({'username': user_name}, {'$push': {'stockDetails': json_data}})
+        except:
+            print('#####Exiting add_user_stock_details fail#####')
+            return False
+    else:
+        print('#####Exiting add_user_stock_details success without updates#####')
+        return 0
+    print('#####Exiting add_user_stock_details success with updates#####')
+    return 1
+
+
+def add_to_stock_dump(json_data):
+    print('#####Entering add_to_stock_dump####')
+    ticker_symbol = json_data['ticker']
+    fetch_stock_result = db_stock_dump.find_one({'stockName': ticker_symbol})
+    if fetch_stock_result is None:
+        try:
+            json_db_stock_dump = external_hits.get_stock_quote(ticker_symbol)
+            db_stock_dump.insert_one(json_db_stock_dump)
+        except:
+            print('#####Exiting add_to_stock_dump fail1#####')
+            return False
+    print('#####Exiting add_to_stock_dump success#####')
+    return True

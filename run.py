@@ -12,6 +12,9 @@ mongo = PyMongo(app)
 jwt = JWTManager(app)
 dbConnection = mongo.db.dbTest
 tokenDetails = mongo.db.tokenCollection
+db_stock_dump = mongo.db.stockDump
+alphavantage_api_key = 'TPTE05D3FRVY8IR6';
+
 api = Api(app)
 
 print("###### Ending dbInitialize() funtion #####w")
