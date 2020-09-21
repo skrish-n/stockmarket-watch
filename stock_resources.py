@@ -34,7 +34,7 @@ class AddStock(Resource):
             }
         elif return_value == 0:
             return {
-                'returnCode' : 201,
+                'returnCode' : '201',
                 'message': 'No db updates'
             }
         else:

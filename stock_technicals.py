@@ -17,6 +17,18 @@ def getStockQuote(symbol):
     print(data['Global Quote']['05. price'])
     return price
 
+def getStockQuoteNew(symbol):
+    quoteURL = "https://finnhub.io/api/v1/quote?symbol=" + symbol + "&token=bt8b6hv48v6srkbhggl0"
+
+    res = requests.get(quoteURL)
+    if (res.status_code !=200):
+        return None
+
+    data = res.json()
+    current_price = float(data['c'])
+    print(current_price)
+    return current_price
+
 
 def main():
     # get the stock quote of company:
@@ -61,7 +73,7 @@ def add_to_stock_dump(json_data):
     fetch_stock_result = db_stock_dump.find_one({'stockName': ticker_symbol})
     if fetch_stock_result is None:
         try:
-            json_db_stock_dump = external_hits.get_stock_quote(ticker_symbol)
+            json_db_stock_dump = external_hits.get_stock_quote_new(ticker_symbol)
             db_stock_dump.insert_one(json_db_stock_dump)
         except:
             print('#####Exiting add_to_stock_dump fail1#####')

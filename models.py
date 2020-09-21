@@ -21,6 +21,11 @@ def find_by_username(username):
     else:
         return fetchRecord
 
+def update_registration(username):
+    updateId = dbConnection.update_one(
+        {'username':username},
+        {'$set':{'activated':True}}
+    )
 
 def revokedTokenModel(jsonData):
     insertedId = tokenDetails.insert_one(jsonData).inserted_id

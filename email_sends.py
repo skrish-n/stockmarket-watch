@@ -1,6 +1,8 @@
 import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from flask_mail import Message
+from run import app, mail
 
 
 def registrationEmail(emailAddress):
@@ -62,3 +64,12 @@ def sendStockReminder(priceMessage):
             sender_email, receiver_email, message.as_string()
         )
         # Create a secure SSL context
+
+
+def send_email(to, subject, template):
+    msg = Message(
+        subject, recipients=[to],
+        html=template,
+        sender=app.config['MAIL_DEFAULT_SENDER']
+    )
+    mail.send(msg)
