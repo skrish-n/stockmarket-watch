@@ -18,7 +18,6 @@ class UserRegistration(Resource):
         print("#######Entering UserRegistration#######")
         import email_sends, generic_technical
         data = parser.parse_args()
-        ##fetchResult = models.find_by_username(data['username'])
         fetch_user = User.objects(username=data['username'])
         if fetch_user:
             return {'message': 'User {} already exists'.format(data['username'])}
@@ -138,7 +137,7 @@ class ConfirmEmail(Resource):
 
         try:
             user_name = generic_technical.confirm_token(token)
-            print("decrypted username:",user_name)
+            print("decrypted username:", user_name)
         except:
             print("#######Exiting ConfirmEmail Class- Fail#######")
             return {'message': 'The confirmation link is invalid or has expired.'}
@@ -148,7 +147,7 @@ class ConfirmEmail(Resource):
         if user['activated']:
             return {'message': 'Account already confirmed. Please login.'}
         else:
-            user.activated=True
+            user.activated = True
             user.save()
             # Redirect to Login URL:
             headers = {'Content-Type': 'text/html'}
