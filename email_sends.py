@@ -2,9 +2,9 @@ import smtplib, ssl
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from flask_mail import Message
-from run import app, mail
+from run import mail,app
 
-
+'''
 def registrationEmail(emailAddress):
     return True
 
@@ -15,12 +15,6 @@ def sendStockReminder(priceMessage):
     sender_email = "saitest101@gmail.com"
     receiver_email = "080sai@gmail.com"
     password = "saitest101adobe"
-    '''rec = []
-    for var in receiver_email:
-        rec.append(var.encode('utf-8'))
-
-    print(rec)
-    '''
     print(receiver_email)
     # print(type(receiver_email))
     message = MIMEMultipart("alternative")
@@ -65,11 +59,14 @@ def sendStockReminder(priceMessage):
         )
         # Create a secure SSL context
 
-
+'''
 def send_email(to, subject, template):
+    print("#######Entering send_email() from email_sends.py#######")
     msg = Message(
         subject, recipients=[to],
         html=template,
         sender=app.config['MAIL_DEFAULT_SENDER']
     )
     mail.send(msg)
+    print("#######Exiting send_email() from email_sends.py#######")
+    return

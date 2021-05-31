@@ -1,5 +1,6 @@
 from itsdangerous import URLSafeTimedSerializer
 from run import app
+from passlib.hash import pbkdf2_sha256 as sha256
 
 def generate_confirmation_token(user_name):
     print("#############Entering generate_confirmation_token##############################")
@@ -10,7 +11,7 @@ def generate_confirmation_token(user_name):
     return serializer.dumps(user_name,salt=app.config['REGISTER_SECURITY_PASSWORD_SALT'])
 
 def confirm_token(token,expiration =3600):
-    print("#############Entering confirm_token##############################")
+    print("#############Entering confirm_token()##############################")
     serializer = URLSafeTimedSerializer(app.config['REGISTER_SECRET_KEY'])
     try:
         user_name = serializer.loads(
@@ -19,6 +20,15 @@ def confirm_token(token,expiration =3600):
             max_age=expiration
         )
     except:
-        return False;
-    return user_name;
+        print("#######Exiting UserRegistration- Fail#######")
+        return False
+    print("#######Exiting UserRegistration- Success#######")
+    return user_name
+
+def generate_hash(password):
+    return sha256.hash(password)
+
+
+def verify_hash(password, hashedPwd):
+    return sha256.verify(password, hashedPwd)
 
