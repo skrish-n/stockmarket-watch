@@ -28,9 +28,6 @@ class UserRegistration(Resource):
                             , activated=False, updated_at=datetime.now(), created_at=datetime.now())
             new_user.save()
 
-            # userTest = User.objects(username="sai").first()
-            # print(userTest)
-            # models.save_one_to_db(new_user)
             registration_token = generic_technical.generate_confirmation_token(data['username'])
             print('registration token:', registration_token)
             confirm_url = url_for("api.confirm", token=registration_token, _external=True)
