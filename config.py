@@ -1,4 +1,3 @@
-
 class Config:
     MONGODB_HOST = "mongodb+srv://skrish:Mesutozil1234!@cluster0.rqkke.mongodb.net/StockWatchDB?retryWrites=true&w=majority"
     MONGODB_DB = 'StockWatchDB'
@@ -19,3 +18,6 @@ class Config:
     MAIL_PASSWORD = 'saitest101adobe'
 
     MAIL_DEFAULT_SENDER = 'saitest101@gmail.com'
+
+    # Alphavantage stock api key
+    FINNHUB_KEY = 'bt8b6hv48v6srkbhggl0'

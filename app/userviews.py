@@ -2,10 +2,11 @@ from flask_restful import Resource, reqparse
 from flask import render_template, make_response, flash, url_for
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required,
                                 get_jwt_identity, get_raw_jwt)
-from .models import User, UserStock
+from .models import User, UserStock, RevokedToken
 from datetime import datetime
 from .apidata import UserSchema, UserStockSchema
 
+userSchema = UserSchema()
 parser = reqparse.RequestParser()
 parser.add_argument('username', help='This field cannot be blank', required=True)
 parser.add_argument('password', help='This field cannot be blank', required=True)
@@ -45,15 +46,16 @@ class UserRegistration(Resource):
             return {'message': 'Something went wrong'}, 500
 
 
-'''
 class UserLogin(Resource):
     def post(self):
+        import generic_technical
         data = parser.parse_args()
-        currentUser = models.find_by_username(data['username'])
-        if not currentUser:
+        current_user = User.objects(username=data['username']).first()
+        print(current_user)
+        if current_user is None:
             return {'message': 'User {} does not exist'.format(data['username'])}
 
-        if models.verify_hash(data['password'], currentUser['password']):
+        if generic_technical.verify_hash(data['password'], current_user['password']):
             access_token = create_access_token(identity=data['username'])
             refresh_token = create_refresh_token(identity=data['username'])
             return {
@@ -62,19 +64,20 @@ class UserLogin(Resource):
                 'refresh_token': refresh_token
             }
         else:
-            return {'message':'password does not match'}
+            return {'message': 'password does not match'}
 
 
 class UserLogoutAccess(Resource):
     @jwt_required
     def post(self):
+        import generic_technical
+        # token_data = TokenCollection(jti=get_raw_jwt()['jti'])
         jti = get_raw_jwt()['jti']
-        insertJtiData = {
-            'jti': jti
-        }
+
         try:
-            revoked_token = models.revokedTokenModel(insertJtiData)
-            return {'message': 'Refresh token has been revoked'}
+            revoked_token = RevokedToken(jti=jti)
+            revoked_token.save()
+            return {'message': 'Logout token has been revoked'}
         except:
             return {'message': 'Something went wrong'}, 500
 
@@ -83,17 +86,16 @@ class UserLogoutRefresh(Resource):
     @jwt_refresh_token_required
     def post(self):
         jti = get_raw_jwt()['jti']
-        insertJtiData = {
-            'jti': jti
-        }
         try:
-            revoked_token = models.revokedTokenModel(insertJtiData)
+            revoked_token = RevokedToken(jti=jti)
+            revoked_token.save()
             return {'message': 'Refresh token has been revoked'}
         except:
             return {'message': 'Something went wrong'}, 500
 
 
 class TokenRefresh(Resource):
+    @jwt_refresh_token_required
     def post(self):
         current_user = get_jwt_identity()
         access_token = create_access_token(identity=current_user)
@@ -116,13 +118,11 @@ class SecretResource(Resource):
             'answer': 42
         }
 
-'''
-
 
 class Home(Resource):
 
     def get(self):
-        headers = {'COntent-Type': 'text/html'}
+        headers = {'Content-Type': 'text/html'}
         return make_response(render_template('home.html'), 200, headers)
 
 

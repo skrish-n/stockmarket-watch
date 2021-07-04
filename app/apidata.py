@@ -3,8 +3,9 @@ from marshmallow import Schema, fields
 
 class UserStockSchema(Schema):
     ticker = fields.Str(required=True)
-    notificationAmount = fields.Float(required=True)
-    enabledEmailNotifications = fields.Boolean()
+    notification_upper_limit = fields.Float()
+    notification_lower_limit = fields.Float()
+    enabled_email_notifications = fields.Boolean(required=True)
 
 class UserSchema(Schema):
 

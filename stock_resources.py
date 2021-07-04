@@ -1,44 +1,77 @@
 from flask_restful import Resource, reqparse
-import models, stock_technicals
+import stock_utils
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required,
                                 get_jwt_identity, get_raw_jwt)
-
-parser = reqparse.RequestParser()
-parser.add_argument('bestMatches')
+from flask import request, jsonify
+from marshmallow import ValidationError
+from app.apidata import UserStockSchema
+from app.models import Stockdump, UserStock, User
+from mongoengine.queryset.visitor import Q
 
 
 class SearchSymbols(Resource):
     def post(self):
-        data = parser.parse_args()
+        data = request.json
 
 
 class AddStock(Resource):
     @jwt_required
     def post(self):
-        parser.add_argument('ticker', help='The ticker symbol is not present', required=True)
-        parser.add_argument('notificationAmount', type=int, help='Type of notificationAmount should be int')
-        parser.add_argument('enabledEmailNotifications',type=bool, help='Type of notificationAmount should be bool')
-        data = parser.parse_args()
-        stock_dump_return = stock_technicals.add_to_stock_dump(data)
-        if stock_dump_return is False:
-            return {
-                'returnCode': '601',
-                'message': 'Insertion Error! Could not fetch/add stock details'
-            }
+        print('#####Entering AddStock() Class ####')
+        request_data = request.get_json()
+        print(request_data)
+        try:
+            UserStockSchema().load(request_data)
+        except ValidationError as err:
+            return err.messages
+        print("After Marshmallow object")
         username = get_jwt_identity()
-        return_value = stock_technicals.add_user_stock_details(data, username)
-        if return_value == 1:
+        # Check if the ticker exists in the user stock dump
+        user = User.objects(Q(username=username) & Q(user_stock_details__ticker=request_data['ticker'])).first()
+        # user = Stockdump.objects(__raw__={''}
+        # print(user.count())
+        if user is not None:
+            print('#####Exiting AddStock() Class ####')
             return {
                 'returnCode': '200',
-                'message': 'Insertion Successful'
+                'message': 'user stock record exists'
             }
-        elif return_value == 0:
-            return {
-                'returnCode' : '201',
-                'message': 'No db updates'
-            }
-        else:
+
+        current_stock = Stockdump.objects(ticker=request_data['ticker']).first()
+        try:
+            print('current stock', current_stock)
+            if current_stock is None:
+                current_stock = stock_utils.add_new_stock(request_data['ticker'])
+                if current_stock is False:
+                    print('#####Exiting AddStock() Class Fail####')
+                    return {
+                        'returnCode': '600',
+                        'message': 'Adding new Stock failed'
+                    }
+
+           # current_user = User.objects.get(username=username)
+           # print('current user', current_user['username'])
+            print('before userStock object')
+            user_stock_details = UserStock(ticker=request_data['ticker'],
+                                           notification_upper_limit=request_data[
+                                               'notification_upper_limit'],
+                                           notification_lower_limit=request_data[
+                                               'notification_lower_limit'],
+                                           enabled_email_notifications=request_data[
+                                               'enabled_email_notifications']
+                                           )
+            print('after userStock object')
+            print(user_stock_details.notification_lower_limit)
+            user = User.objects(username=username).get()
+            user.user_stock_details.append(user_stock_details)
+            user.save()
+        except:
             return {
                 'returnCode': '600',
                 'message': 'Insertion Error! Could not add stock to user collection'
             }
+        print('#####Exiting AddStock() Class Completed####')
+        return {
+            'returnCode': '200',
+            'message': 'Insertion Successful'
+        }

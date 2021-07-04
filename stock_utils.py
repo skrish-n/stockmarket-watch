@@ -1,12 +1,12 @@
-#!/usr/bin/env python
 from flask_jwt_extended import (create_access_token, create_refresh_token, jwt_required, jwt_refresh_token_required,
                                 get_jwt_identity, get_raw_jwt)
 
 import requests, external_hits
-from run import dbConnection, db_stock_dump
+# from run import dbConnection, db_stock_dump
+from app.models import Stockdump
 
 
-def getStockQuote(symbol):
+def old_getStockQuote(symbol):
     quoteUrl = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=TPTE05D3FRVY8IR6"
     r = requests.get(quoteUrl)
 
@@ -17,11 +17,12 @@ def getStockQuote(symbol):
     print(data['Global Quote']['05. price'])
     return price
 
-def getStockQuoteNew(symbol):
+
+def get_stock_quote(symbol):
     quoteURL = "https://finnhub.io/api/v1/quote?symbol=" + symbol + "&token=bt8b6hv48v6srkbhggl0"
 
     res = requests.get(quoteURL)
-    if (res.status_code !=200):
+    if (res.status_code != 200):
         return None
 
     data = res.json()
@@ -30,6 +31,7 @@ def getStockQuoteNew(symbol):
     return current_price
 
 
+'''
 def main():
     # get the stock quote of company:
     symbols = ["ADBE", "HAVELLS.NS", "CUB.NS", "NELCO.NS"]
@@ -80,3 +82,19 @@ def add_to_stock_dump(json_data):
             return False
     print('#####Exiting add_to_stock_dump success#####')
     return True
+'''
+
+
+def add_new_stock(ticker):
+    print('#####Entering add_new_stock() function####')
+    try:
+        new_stock = external_hits.get_stock_quote_new(ticker, 1)
+        if new_stock is False:
+            print('#####Exiting add_new_stock() fail1#####')
+            return False
+        new_stock.save()
+    except:
+        print('#####Exiting add_new_stock() fail2#####')
+        return False
+    print('#####Exiting add_new_stock() Success#####')
+    return new_stock

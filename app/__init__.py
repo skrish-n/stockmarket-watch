@@ -17,9 +17,9 @@ def create_app():
     mail = Mail(app)
     jwt = JWTManager(app)
     db.init_app(app)
-
+   # app.alphavantagekey = 'TPTE05D3FRVY8IR6'
     '''
-    api.add_resource(userviews.UserLogin, '/login')
+    
     api.add_resource(userviews.UserLogoutAccess, '/logout/access')
     api.add_resource(userviews.UserLogoutRefresh, '/logout/refresh')
     api.add_resource(userviews.TokenRefresh, '/token/refresh')
