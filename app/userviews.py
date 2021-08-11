@@ -45,6 +45,10 @@ class UserRegistration(Resource):
             print("#######Exiting UserRegistration-Fail#######")
             return {'message': 'Something went wrong'}, 500
 
+    def get(self):
+        headers = {'Content-Type': 'text/html'}
+        return make_response(render_template('register.html'), 200, headers)
+
 
 class UserLogin(Resource):
     def post(self):
