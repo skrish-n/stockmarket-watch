@@ -65,6 +65,9 @@ a {
   background-color: #f1f1f1;
   text-align: center;
 }
+.warning{
+  color: #ff0000;
+}
 </style>
 </head>
 <body>
@@ -76,16 +79,16 @@ a {
     <hr>
 
     <label for="email"><b>Email</b></label>
-    <input type="text" placeholder="Enter Email" name="email" id="email" required>
+    <input type="text" placeholder="Enter Email" name="username" id="email" required>
 
     <label for="fname"><b>First Name</b></label>
-    <input type="text" placeholder="Enter First name" name="fname" id="fname" required>
+    <input type="text" placeholder="Enter First name" name="firstname" id="fname" required>
 
     <label for="lname"><b>Last Name</b></label>
-    <input type="text" placeholder="Enter Last name" name="lname" id="lname" required>
+    <input type="text" placeholder="Enter Last name" name="lastname" id="lname" required>
 
     <label for="psw"><b>Password</b></label>
-    <input type="password" placeholder="Enter Password" name="psw" id="psw" required>
+    <input type="password" placeholder="Enter Password" name="password" id="psw" required>
 
     <label for="psw-repeat"><b>Repeat Password</b></label>
     <input type="password" placeholder="Repeat Password" name="psw-repeat" id="psw-repeat" required>
@@ -93,10 +96,12 @@ a {
     <p>By creating an account you agree to our <a href="#">Terms & Privacy</a>.</p>
 
     <button type="submit" class="registerbtn">Register</button>
+    {% if user_exist %}
+    <p class="warning">The username {{user_name}} already exists. Please sign in below</p>
+    {% endif %}
   </div>
-
   <div class="container signin">
-    <p>Already have an account? <a href="#">Sign in</a>.</p>
+    <p >Already have an account? <a href="#">Sign in</a>.</p>
   </div>
 </form>
 
