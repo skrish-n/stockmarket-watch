@@ -7,7 +7,7 @@ from app.models import Stockdump
 
 
 def old_getStockQuote(symbol):
-    quoteUrl = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=TPTE05D3FRVY8IR6"
+    quoteUrl = "https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=" + symbol + "&apikey=XXXXXXX"
     r = requests.get(quoteUrl)
 
     if (r.status_code != 200):
@@ -19,7 +19,7 @@ def old_getStockQuote(symbol):
 
 
 def get_stock_quote(symbol):
-    quoteURL = "https://finnhub.io/api/v1/quote?symbol=" + symbol + "&token=bt8b6hv48v6srkbhggl0"
+    quoteURL = "https://finnhub.io/api/v1/quote?symbol=" + symbol + "&token=XXXXXXX"
 
     res = requests.get(quoteURL)
     if (res.status_code != 200):
