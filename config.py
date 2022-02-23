@@ -14,10 +14,10 @@ class Config:
     MAIL_USE_SSL = True
 
     # gmail authentication
-    MAIL_USERNAME = 'saitest101@gmail.com'
-    MAIL_PASSWORD = 'saitest101adobe'
+    MAIL_USERNAME = ''
+    MAIL_PASSWORD = ''
 
-    MAIL_DEFAULT_SENDER = 'saitest101@gmail.com'
+    MAIL_DEFAULT_SENDER = ''
 
     # Alphavantage stock api key
-    FINNHUB_KEY = 'bt8b6hv48v6srkbhggl0'
+    FINNHUB_KEY = ''
