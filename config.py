@@ -1,5 +1,5 @@
 class Config:
-    MONGODB_HOST = "mongodb+srv://skrish:Mesutozil1234!@cluster0.rqkke.mongodb.net/StockWatchDB?retryWrites=true&w=majority"
+    MONGODB_HOST = ""
     MONGODB_DB = 'StockWatchDB'
     JWT_SECRET_KEY = "jwt-secret-string"
     JWT_BLACKLIST_ENABLED = True
